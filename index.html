@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .errorClass{
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+</div>
+
+<header>
+<h1>Vue Example</h1>
+</header>
+
+<main>
+    <div id="app">
+        {{ message }}
+
+        <span v-bind:title="message2">
+            Hover your mouse over me for a few seconds
+            to see my dynamically bound title!
+          </span>
+        <button v-on:click="add"></button>
+        <ul>
+            <li v-for="(todo, key, index) in budget" v-bind:class="{'errorClass': todo.amount > todo.sanction}">
+                <input name="hello" v-model="todo.amount">  {{todo.amount}} - {{ todo.sanction }} <button v-on:click="remove(key)">X</button>
+            </li>
+        </ul>
+        Total amount: {{ totalAmount }} and Sanction amount: {{ totalSanctionAmount }}
+    </div>
+</main>
+
+<footer>
+
+</footer>
+
+<script src="vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        props: {
+            amount: {
+                type: Number
+            }
+        },
+        data: {
+            message: 'Hello Vue!',
+            message2: 'You loaded this page on ' + new Date(),
+            budget: [
+                { amount: 100, sanction: 100 },
+                { amount: 200, sanction: 100 },
+                { amount: 300, sanction: 100 }
+            ]
+        },
+        methods: {
+            remove: function(index){
+                console.log(index);
+                this.budget.splice(index, 1);
+            },
+            add: function(){
+                var value = prompt('Enter text');
+                if (value) {
+                    this.budget.push({text: value});
+                }
+            },
+            handleSubmit: function () {
+
+            }
+        },
+        computed: {
+            totalAmount: function () {
+                return this.budget.reduce(function (sum, item) {
+                    return sum + parseFloat(item.amount);
+                }, 0);
+            },
+            totalSanctionAmount: function () {
+                return this.budget.reduce(function (sum, item) {
+                    return sum + parseFloat(item.amount);
+                }, 0);
+            }
+        }
+    })
+</script>
+
+</body>
+</html>

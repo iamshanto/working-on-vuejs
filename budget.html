@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .errorClass{
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+</div>
+
+<header>
+<h1>Vue Example</h1>
+</header>
+
+<main>
+    <div id="app">
+        <table border="1" cellpadding="2" cellspacing="2">
+            <thead>
+                <tr>
+                    <td>Budget Head</td>
+                    <td>Head Total</td>
+                    <td v-for="office in offices">{{office.name}}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <template v-for="parentHead in budgetHead">
+                    <tr>
+                        <td v-bind:colspan="parentHead.child.length + 2">{{ parentHead.name}}</td>
+                    </tr>
+
+                    <tr v-for="childHead in parentHead.child" >
+                        <td>{{ childHead.name }}</td>
+                        <td>{{ headTotal(childHead) }}</td>
+                        <td v-for="(office, officeId) in offices" :class="{'input': true, 'errorClass': errors.has('data['+budgetData[officeId][childHead.id]['id']+']') }">
+                            <input
+                                    v-validate="'required|max_value:'+budgetData[officeId][childHead.id]['sanction']"
+                                    :data-vv-as="offices[officeId]['name']"
+                                    :name="'data['+budgetData[officeId][childHead.id]['id']+']'"
+                                    v-model="budgetData[officeId][childHead.id]['amount']">
+                            {{ budgetData[officeId][childHead.id]['amount'] }} -
+                            {{ budgetData[officeId][childHead.id]['sanction'] }}
+                        </td>
+                    </tr>
+                </template>
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Budget Head</td>
+                    <td>Head Total</td>
+                    <td v-for="(office, officeId) in offices">{{ officeTotal(officeId) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        {{ errors.all() }}
+        {{ errors.any() }}
+
+        <button type="button" :disabled="errors.any()">Save</button>
+    </div>
+</main>
+
+<footer>
+
+</footer>
+
+<script src="vue.js"></script>
+<script src="vee-validate.js"></script>
+<script>
+    Vue.use(VeeValidate);
+    var head = [
+        {
+            name: 'Head 1', child: [
+                {name: 'Salary', id: 2},
+                {name: 'Bonus', id: 3}
+            ]
+        },
+        {
+            name: 'Head 2', child: [
+            {name: 'Transport', id: 4},
+            {name: 'Food', id: 5}
+        ]
+        }
+    ];
+
+    var budgetData = {
+        12: {
+            2: {id: 1, amount: 200, sanction:444},
+            3: {id: 2, amount: 230, sanction:13},
+            4: {id: 3, amount: 210, sanction:70},
+            5: {id: 4, amount: 70, sanction:50}
+        },
+        13: {
+            2: {id: 5, amount: 150, sanction:444},
+            3: {id: 6, amount: 123, sanction:13},
+            4: {id: 7, amount: 456, sanction:70},
+            5: {id: 8, amount: 50, sanction:50}
+        }
+    };
+
+    var offices = {
+        12: {name: 'HQ'},
+        13: {name: 'Branch Office'}
+    };
+
+    var app;
+    app = new Vue({
+        el: '#app',
+        data: {
+            offices: offices,
+            budgetData: budgetData,
+            budgetHead: head
+        },
+        methods: {
+            remove: function (index) {
+                console.log(index);
+                this.budget.splice(index, 1);
+            },
+            add: function () {
+                var value = prompt('Enter text');
+                if (value) {
+                    this.budget.push({text: value});
+                }
+            },
+            handleSubmit: function () {
+
+            },
+            headTotal: function (head) {
+                var data = this.budgetData;
+                return Object.keys(data).reduce(function (sum, officeId) {
+                    return sum + parseFloat(data[officeId][head.id]['amount']);
+                }, 0);
+            },
+            officeTotal: function(officeId) {
+                var data = this.budgetData;
+                return Object.keys(data[officeId]).reduce(function(subSum, headId){
+                    return subSum + parseFloat(data[officeId][headId]['amount']);
+                }, 0);
+            },
+            getOfficeName: function(officeId){
+                return this.offices[officeId]['name'];
+            }
+        },
+        computed: {
+            /*totalAmount: function () {
+                return this.budget.reduce(function (sum, item) {
+                    return sum + parseFloat(item.amount);
+                }, 0);
+            },
+            totalSanctionAmount: function () {
+                return this.budget.reduce(function (sum, item) {
+                    return sum + parseFloat(item.amount);
+                }, 0);
+            }*/
+        }
+    });
+</script>
+
+</body>
+</html>
